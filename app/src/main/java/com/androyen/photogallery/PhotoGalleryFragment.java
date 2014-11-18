@@ -7,9 +7,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.GridView;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Created by rnguyen on 11/17/14.
@@ -17,6 +19,7 @@ import java.io.IOException;
 public class PhotoGalleryFragment extends Fragment {
     private static final String TAG = PhotoGalleryFragment.class.getSimpleName();
 
+    ArrayList<GalleryItem> mItems;
     GridView mGridView;
 
     @Override
@@ -36,7 +39,29 @@ public class PhotoGalleryFragment extends Fragment {
 
         mGridView = (GridView)v.findViewById(R.id.gridView);
 
+        //Implement adapter
+        setupAdapter();
+
         return v;
+    }
+
+    //Set up adapter for GridView. Used to show captions
+    void setupAdapter() {
+
+        //If there is nothing, exit
+        if (getActivity() == null || mGridView == null) {
+            return;
+        }
+
+        if (mItems != null) {
+            //Create adapter for Gridview
+            mGridView.setAdapter(new ArrayAdapter<GalleryItem>(getActivity(), android.R.layout.simple_gallery_item, mItems));
+
+        }
+        else {
+            //If the arraylist is empty. do not set to the view
+            mGridView.setAdapter(null);
+        }
     }
 
     //AsyncTask to run networking calls
