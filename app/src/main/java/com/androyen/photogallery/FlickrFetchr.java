@@ -3,11 +3,15 @@ package com.androyen.photogallery;
 import android.net.Uri;
 import android.util.Log;
 
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Created by rnguyen on 11/17/14.
@@ -20,6 +24,8 @@ public class FlickrFetchr {
     private static final String METHOD_GET_RECENT = "flickr.photos.getRecent";
     private static final String PARAM_EXTRAS = "extras";
     private static final String EXTRA_SMALL_URL = "url_s";
+
+    private static final String XML_PHOTO = "photo";
 
     //Get raw bytes from Flickr
     byte[] getUrlBytes(String urlSpec) throws IOException {
@@ -72,6 +78,32 @@ public class FlickrFetchr {
         }
         catch (IOException e) {
             Log.e(TAG, "Failed to fetch items", e);
+        }
+    }
+
+    //Parse the XML to get photo
+    void parseItems(ArrayList<GalleryItem> items, XmlPullParser parser) throws XmlPullParserException, IOException {
+
+        int eventType = parser.next();
+
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+
+            if (eventType == XmlPullParser.START_TAG && XML_PHOTO.equals(parser.getName())) {
+
+                //Extract id, caption, smallUrl of Photo data
+                String id = parser.getAttributeValue(null, "id");
+                String caption = parser.getAttributeValue(null, "title");
+                String smallUrl = parser.getAttributeValue(null, EXTRA_SMALL_URL);
+
+                //Create new GalleryItem
+                GalleryItem item = new GalleryItem();
+                item.setId(id);
+                item.setCaption(caption);
+                item.setUrl(smallUrl);
+
+            }
+
+            eventType = parser.next();
         }
     }
 }
