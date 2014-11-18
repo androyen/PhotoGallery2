@@ -5,10 +5,12 @@ import android.util.Log;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -19,7 +21,7 @@ import java.util.ArrayList;
 public class FlickrFetchr {
     private static final String TAG = FlickrFetchr.class.getSimpleName();
 
-    private static final String ENDPOINT = "http://api.flickr.com/services/rest/";
+    private static final String ENDPOINT = "https://api.flickr.com/services/rest/";
     private static final String API_KEY = "93f326b4268077daea2d034d51be6434";
     private static final String METHOD_GET_RECENT = "flickr.photos.getRecent";
     private static final String PARAM_EXTRAS = "extras";
@@ -65,7 +67,10 @@ public class FlickrFetchr {
     }
 
     //URL for fetching Flickr items
-    public void fetchItems() {
+    public ArrayList<GalleryItem> fetchItems() {
+
+        ArrayList<GalleryItem> items = new ArrayList<GalleryItem>();
+
         try {
             String url = Uri.parse(ENDPOINT).buildUpon()
                     .appendQueryParameter("method", METHOD_GET_RECENT)
@@ -75,10 +80,23 @@ public class FlickrFetchr {
 
             String xmlString = getUrl(url);
             Log.i(TAG, "Received xml: " + xmlString);
+
+            //Use XMlPullParser
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            XmlPullParser parser = factory.newPullParser();
+            parser.setInput(new StringReader(xmlString));
+
+            //Feed it an arraylist and a parser
+            parseItems(items, parser);
         }
         catch (IOException e) {
             Log.e(TAG, "Failed to fetch items", e);
         }
+        catch (XmlPullParserException e) {
+            Log.e(TAG, "Failed to parse items", e);
+        }
+
+        return items;
     }
 
     //Parse the XML to get photo
