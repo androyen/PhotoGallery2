@@ -48,7 +48,7 @@ public class PhotoGalleryFragment extends Fragment {
     //Set up adapter for GridView. Used to show captions
     void setupAdapter() {
 
-        //If there is nothing, exit
+        //If there is nothing, exit   Checking if fragment is attached to the activity
         if (getActivity() == null || mGridView == null) {
             return;
         }
@@ -65,10 +65,10 @@ public class PhotoGalleryFragment extends Fragment {
     }
 
     //AsyncTask to run networking calls
-    private class FetchItemsTask extends AsyncTask<Void, Void, Void> {
+    private class FetchItemsTask extends AsyncTask<Void, Void, ArrayList<GalleryItem>> {
 
         @Override
-        protected Void doInBackground(Void... params) {
+        protected ArrayList<GalleryItem> doInBackground(Void... params) {
 //            try {
 //                String result = new FlickrFetchr().getUrl("http://www.google.com");
 //                Log.i(TAG, "Fetched contents of URL: " + result);
@@ -76,9 +76,16 @@ public class PhotoGalleryFragment extends Fragment {
 //            catch (IOException e) {
 //                Log.e(TAG, "Failed to fetch URL: ", e);
 //            }
-            new FlickrFetchr().fetchItems();
+           return new FlickrFetchr().fetchItems();
 
-            return null;
+
+        }
+
+        @Override
+        protected void onPostExecute(ArrayList<GalleryItem> items) {
+            //Called on the UI thread.  Updating the view to show the photo captions
+            mItems = items;
+            setupAdapter();
         }
 
     }

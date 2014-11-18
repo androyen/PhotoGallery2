@@ -22,7 +22,7 @@ public class FlickrFetchr {
     private static final String TAG = FlickrFetchr.class.getSimpleName();
 
     private static final String ENDPOINT = "https://api.flickr.com/services/rest/";
-    private static final String API_KEY = "93f326b4268077daea2d034d51be6434";
+    private static final String API_KEY = "fbd1e979da72724e32d78b8b724403de";
     private static final String METHOD_GET_RECENT = "flickr.photos.getRecent";
     private static final String PARAM_EXTRAS = "extras";
     private static final String EXTRA_SMALL_URL = "url_s";
@@ -118,6 +118,8 @@ public class FlickrFetchr {
                 item.setId(id);
                 item.setCaption(caption);
                 item.setUrl(smallUrl);
+                items.add(item);
+
 
             }
 
